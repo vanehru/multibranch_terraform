@@ -9,6 +9,13 @@ pipeline {
     }
 
     stages{
+        
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('terraform Init'){
             steps{
                 dir('./gitops') {
@@ -29,7 +36,7 @@ pipeline {
             when { branch 'main' }
             steps{
                 script{
-                    waitunit{
+                    waituntil{
                         fileExists('dummyfile')
                     }
                 }
@@ -49,3 +56,5 @@ pipeline {
 
 
 }
+
+
