@@ -19,10 +19,11 @@ pipeline {
 
         stage('terraform plan') {
             steps {
-                dir('./gitops') {
-                    sh "${TERRAFORM_BINARY} plan"
+                 dir('./gitops') {
+                    sh '/usr/bin/terraform plan > terraform_plan.log 2>&1'
                 }
             }
+
         }
 
         stage('Terraform apply') {
