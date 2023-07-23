@@ -4,19 +4,15 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        TERRAFORM_BINARY = sh(returnStdout: true, script: 'which terraform').trim()
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
+        // ... your stages here ...
         stage('terraform Init') {
             steps {
                 dir('./gitops') {
-                    sh '/usr/local/bin/terraform init'
+                    sh "${TERRAFORM_BINARY} init"
                 }
             }
         }
@@ -24,18 +20,7 @@ pipeline {
         stage('terraform plan') {
             steps {
                 dir('./gitops') {
-                    sh '/usr/local/bin/terraform plan'
-                }
-            }
-        }
-
-        stage('Approval') {
-            when { branch 'main' }
-            steps {
-                script {
-                    waitUntil {
-                        fileExists('dummyfile')
-                    }
+                    sh "${TERRAFORM_BINARY} plan"
                 }
             }
         }
@@ -43,7 +28,7 @@ pipeline {
         stage('Terraform apply') {
             steps {
                 dir('./gitops') {
-                    sh '/usr/local/bin/terraform apply -auto-approve'
+                    sh "${TERRAFORM_BINARY} apply -auto-approve"
                 }
             }
         }
