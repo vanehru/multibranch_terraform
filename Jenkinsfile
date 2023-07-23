@@ -2,59 +2,50 @@ pipeline {
     agent any
 
     environment {
-		AWS_ACCESS_KEY_ID = crdebtials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = crdebtials('AWS_SECRET_ACCESS_KEY')
-        
-        
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
     }
 
-    stages{
-        
+    stages {
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('terraform Init'){
-            steps{
+        stage('terraform Init') {
+            steps {
                 dir('./gitops') {
                     sh '/usr/local/bin/terraform init'
                 }
             }
         }
 
-        stage('terraform plan'){
-            steps{
+        stage('terraform plan') {
+            steps {
                 dir('./gitops') {
                     sh '/usr/local/bin/terraform plan'
                 }
             }
         }
 
-        stage('Approval'){
+        stage('Approval') {
             when { branch 'main' }
-            steps{
-                script{
-                    waituntil{
+            steps {
+                script {
+                    waitUntil {
                         fileExists('dummyfile')
                     }
                 }
             }
         }
 
-        stage('Terraform apply'){
-            steps{
+        stage('Terraform apply') {
+            steps {
                 dir('./gitops') {
                     sh '/usr/local/bin/terraform apply -auto-approve'
                 }
             }
-        }        
-    
-            
+        }
     }
-
-
 }
-
-
